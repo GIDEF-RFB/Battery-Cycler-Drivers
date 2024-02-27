@@ -29,8 +29,8 @@ from scpi_sniffer import DrvScpiSerialConfC, DrvScpiHandlerC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_bk/')
-from src.wattrex_driver_bk import DrvBkModeE
-from wattrex_driver_base import DrvBaseStatusE
+from src.rfb_driver_bk import DrvBkModeE
+from rfb_driver_base import DrvBaseStatusE
 
 #######################              ENUMS               #######################
 

@@ -18,7 +18,7 @@ log = sys_log_logger_get_module_logger(__name__)
 from system_shared_tool import SysShdIpcChanC
 #######################          PROJECT IMPORTS         #######################
 from scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
-from wattrex_driver_base import (DrvBasePwrPropertiesC, DrvBasePwrDataC, DrvBaseStatusC,
+from rfb_driver_base import (DrvBasePwrPropertiesC, DrvBasePwrDataC, DrvBaseStatusC,
         DrvBaseStatusE, DrvBasePwrDeviceC)
 
 #######################          MODULE IMPORTS          #######################
