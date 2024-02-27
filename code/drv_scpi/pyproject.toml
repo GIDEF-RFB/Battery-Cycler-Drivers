@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # users can install this project, e.g.:
 #
 # $ pip install <sampleproject>
-name = "SCPI-sniffer"
+name = "rfb-SCPI-sniffer"
 
 # Versions should comply with PEP 440:
 # https://www.python.org/dev/peps/pep-0440/
@@ -141,10 +141,10 @@ dependencies = { file = ["requirements.txt"] }
 # maintainers, and where to support the project financially. The key is
 # what's used to render the link text on PyPI.
 [project.urls] # Optional
-"Homepage" = "https://github.com/WattRex/Battery-Cycler-Drivers"
-"Bug Reports" = "https://github.com/WattRex/Battery-Cycler-Drivers/issues"
-"Bug Tracker" = "https://github.com/WattRex/Battery-Cycler-Drivers/issues"
-"Source" = "https://github.com/WattRex/Battery-Cycler-Drivers"
+"Homepage" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers"
+"Bug Reports" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers/issues"
+"Bug Tracker" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers/issues"
+"Source" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers"
 "Funding" = "https://donate.pypi.org"
 # "Say Thanks!" = "http://saythanks.io/to/example"
 
@@ -165,6 +165,6 @@ dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools_scm]
 root = "../../"
-write_to = "code/drv_scpi/src/scpi_sniffer/__version__.py"
+write_to = "code/drv_scpi/src/rfb_scpi_sniffer/__version__.py"
 version_scheme = "python-simplified-semver"
 normalize = "True"

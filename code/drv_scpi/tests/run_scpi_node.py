@@ -28,7 +28,7 @@ log = sys_log_logger_get_module_logger(__name__)
 
 #######################          MODULE IMPORTS          #######################
 # path.append(os.getcwd()+'/code/')
-from drv_scpi.src.scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
+from drv_scpi.src.rfb_scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
 # from scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
 
 #######################            FUNCTIONS             #######################

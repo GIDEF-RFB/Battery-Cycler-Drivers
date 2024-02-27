@@ -24,7 +24,7 @@ from system_shared_tool import SysShdIpcChanC
 
 #######################          PROJECT IMPORTS         #######################
 sys.path.append(os.getcwd())
-from drv_scpi.src.scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
+from drv_scpi.src.rfb_scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
 
 #######################          MODULE IMPORTS          #######################
 
