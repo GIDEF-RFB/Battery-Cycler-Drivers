@@ -24,9 +24,9 @@ from scpi_sniffer import DrvScpiSerialConfC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_ea/')
-from src.wattrex_driver_ea.drv_ea import DrvEaDeviceC
-from wattrex_driver_base import DrvBasePwrModeE
-from wattrex_driver_bk import DrvBkDeviceC, DrvBkModeE
+from src.rfb_driver_ea.drv_ea import DrvEaDeviceC
+from rfb_driver_base import DrvBasePwrModeE
+from rfb_driver_bk import DrvBkDeviceC, DrvBkModeE
 #######################              ENUMS               #######################
 
 

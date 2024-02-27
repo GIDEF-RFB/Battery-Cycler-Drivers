@@ -21,7 +21,7 @@ from system_shared_tool import SysShdIpcChanC # pylint: disable=wrong-import-pos
 
 #######################          PROJECT IMPORTS         #######################
 from scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
-from wattrex_driver_base import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, DrvBasePwrDeviceC,
+from rfb_driver_base import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, DrvBasePwrDeviceC,
                                 DrvBasePwrPropertiesC, DrvBasePwrDataC)
 
 #######################          MODULE IMPORTS          #######################
