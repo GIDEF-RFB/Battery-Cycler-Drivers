@@ -144,7 +144,7 @@ dependencies = {file = ["requirements.txt"]}
 "Homepage" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers"
 "Bug Reports" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers/issues"
 "Bug Tracker" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers/issues"
-"Source" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers"
+"Source" = "https://github.com/GIDEF-RFB/Battery-Cycler-Drivers/code/drv_base/src/rfb_driver_base"
 "Funding" = "https://donate.pypi.org"
 # "Say Thanks!" = "http://saythanks.io/to/example"
 
