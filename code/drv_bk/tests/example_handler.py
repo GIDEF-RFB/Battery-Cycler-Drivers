@@ -17,15 +17,13 @@ from serial import PARITY_ODD
 
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
-from system_logger_tool import sys_log_logger_get_module_logger
-if __name__ == '__main__':
-    from system_logger_tool import SysLogLoggerC
-    cycler_logger = SysLogLoggerC(file_log_levels= 'code/log_config.yaml')
+from rfb_logger_tool import sys_log_logger_get_module_logger,SysLogLoggerC
+cycler_logger = SysLogLoggerC(file_log_levels= 'code/log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
-from system_shared_tool import SysShdIpcChanC
+from rfb_shared_tool import SysShdIpcChanC
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC, DrvScpiHandlerC
+from rfb-scpi_sniffer import DrvScpiSerialConfC, DrvScpiHandlerC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_bk/')
@@ -45,35 +43,6 @@ def exp_number(str_msg):
             response = float(msg_sci[0])
     return response
 
-# def translate_msg(msg):
-#     if isinstance(msg, list):
-#         for data in msg:
-#             if len(data) >0 and not str(data).startswith(":"):
-#                 data = exp_number(data) if exp_number(data) is not None else data
-#                 if isinstance(data, str):
-#                     if 'volt' in data:
-#                         if 'ac' in data:
-#                             data = DrvBkModeE.VOLT_AC
-#                         else:
-#                             data = DrvBkModeE.VOLT_DC
-#                     elif 'curr' in data:
-#                         if 'ac' in data:
-#                             data = DrvBkModeE.CURR_AC
-#                         else:
-#                             data = DrvBkModeE.CURR_DC
-#                     elif len(data.split(',')) == 3:
-#                         data = data.split(',')
-#                         log.info(f"Serial number: {data[-1]}")
-#                         log.info(f"Model: {data[0]}")
-#                     log.info(f"Response: {data}")
-#                 else:
-#                     log.info(f"Value read: {data}")
-#     elif isinstance(msg, str):
-#         if len(data) >0 and not str(data).startswith(":"):
-#             data = exp_number(msg) if exp_number(msg) is not None else msg
-#             log.info(f"Response: {data}")
-
-#             # Check if data is a number
 def translate_msg(msg):
     for data in msg:
         if len(data) >0 and not str(data).startswith(":"):
@@ -120,7 +89,7 @@ def main():
     ea_chan = SysShdIpcChanC(name = "ea_rx", max_message_size= 300)
     try:
         bk_handler = DrvScpiHandlerC(serial_conf=bk_scpi_conf, rx_chan_name= "bk_rx")
-        # ea_handler = DrvScpiHandlerC(serial_conf=ea_scpi_conf, rx_chan_name= "ea_rx")
+        ea_handler = DrvScpiHandlerC(serial_conf=ea_scpi_conf, rx_chan_name= "ea_rx")
         input("Press Enter to continue...")
         bk_handler.send(':FUNC:CURR:DC:RANGE:AUTO ON')
         time.sleep(2)

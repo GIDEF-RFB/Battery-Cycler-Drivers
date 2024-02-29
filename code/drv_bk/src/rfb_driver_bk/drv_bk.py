@@ -11,13 +11,13 @@ from time import time, sleep
 #######################       THIRD PARTY IMPORTS        #######################
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC()
 log = sys_log_logger_get_module_logger(__name__)
-from system_shared_tool import SysShdIpcChanC
+from rfb_shared_tool import SysShdIpcChanC
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
+from rfb_scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
 from rfb_driver_base import (DrvBasePwrPropertiesC, DrvBasePwrDataC, DrvBaseStatusC,
         DrvBaseStatusE, DrvBasePwrDeviceC)
 
