@@ -13,8 +13,8 @@ from paho.mqtt.properties import Properties
 from paho.mqtt.packettypes import PacketTypes
 
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_config_tool import sys_conf_read_config_params
-from system_logger_tool import Logger, sys_log_logger_get_module_logger
+from rfb_config_tool import sys_conf_read_config_params
+from rfb_logger_tool import Logger, sys_log_logger_get_module_logger
 log: Logger = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
