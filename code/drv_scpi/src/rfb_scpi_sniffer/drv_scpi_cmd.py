@@ -12,11 +12,11 @@ from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 #######################       THIRD PARTY IMPORTS        #######################
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
-import system_logger_tool as sys_log
+import rfb_logger_tool as sys_log
 if __name__ == "__main__":
     cycler_logger = sys_log.SysLogLoggerC()
 log = sys_log.sys_log_logger_get_module_logger(__name__)
-from system_shared_tool import SysShdNodeStatusE # pylint: disable=wrong-import-position
+from rfb_shared_tool import SysShdNodeStatusE # pylint: disable=wrong-import-position
 
 #######################          PROJECT IMPORTS         #######################
 

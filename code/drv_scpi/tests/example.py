@@ -15,12 +15,12 @@ from serial import EIGHTBITS, PARITY_NONE, PARITY_ODD, STOPBITS_ONE, Serial
 #######################       THIRD PARTY IMPORTS        #######################
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels='./log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
-from system_shared_tool import SysShdIpcChanC
+from rfb_shared_tool import SysShdIpcChanC
 
 #######################          PROJECT IMPORTS         #######################
 sys.path.append(os.getcwd())

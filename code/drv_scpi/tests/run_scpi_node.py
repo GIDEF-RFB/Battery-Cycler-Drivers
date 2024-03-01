@@ -21,7 +21,7 @@ from threading import Event
 
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
 path.append(os.getcwd())
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels='./log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
@@ -29,7 +29,7 @@ log = sys_log_logger_get_module_logger(__name__)
 #######################          MODULE IMPORTS          #######################
 # path.append(os.getcwd()+'/code/')
 from drv_scpi.src.rfb_scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
-# from scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
+# from rfb_scpi_sniffer import DrvScpiNodeC # pylint: disable=wrong-import-position
 
 #######################            FUNCTIONS             #######################
 if __name__ == '__main__':
