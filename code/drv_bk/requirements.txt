@@ -2,4 +2,4 @@ pyserial>=3.5
 rfb_SCPI_sniffer>=0.0.1
 rfb_logger_tool>=0.0.1
 rfb_shared_tool<=0.0.1
-rfb_driver_base>=0.0.1
+rfb_driver_bases>=0.0.1
