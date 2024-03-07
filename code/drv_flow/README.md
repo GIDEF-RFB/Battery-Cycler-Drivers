@@ -45,3 +45,8 @@
 5. References
 - Flowmeter: https://es.rs-online.com/web/p/caudalimetros/5082704
 - Arduino uno: https://store.arduino.cc/products/arduino-uno-rev3
+
+Co-authors:
+[Roberto Aldea](https://pypi.org/user/Raldea/), 
+[Javier Sanz](https://pypi.org/user/javibu13/),
+[Marius Crisan](https://pypi.org/user/mariuscrsn/)
