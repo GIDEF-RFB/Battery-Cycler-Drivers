@@ -14,14 +14,14 @@ from can import ThreadSafeBus, Message, CanOperationError
 #######################       THIRD PARTY IMPORTS        #######################
 
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import sys_log_logger_get_module_logger, SysLogLoggerC, Logger
+from rfb_logger_tool import sys_log_logger_get_module_logger, SysLogLoggerC, Logger
 
 #######################       LOGGER CONFIGURATION       #######################
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels='../log_config.yaml')
 log: Logger = sys_log_logger_get_module_logger(__name__)
 
-from system_shared_tool import SysShdIpcChanC, SysShdNodeC, SysShdNodeParamsC, SysShdNodeStatusE
+from rfb_shared_tool import SysShdIpcChanC, SysShdNodeC, SysShdNodeParamsC, SysShdNodeStatusE
 #######################          PROJECT IMPORTS         #######################
 
 #######################          MODULE IMPORTS          #######################

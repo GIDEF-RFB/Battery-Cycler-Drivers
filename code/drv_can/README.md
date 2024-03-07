@@ -15,6 +15,11 @@ cat /proc/sys/fs/mqueue/msgsize_max
 ```
 In order to change the max message or message size in queues run:
 ```
-sudo sh -c 'echo 200 > /proc/sys/fs/mqueue/msg_max'
-sudo sh -c 'echo 200 > /proc/sys/fs/mqueue/msgsize_max'
+sudo sh -c 'echo 500 > /proc/sys/fs/mqueue/msg_max'
+sudo sh -c 'echo 500 > /proc/sys/fs/mqueue/msgsize_max'
 ```
+
+Co-authors:
+[Roberto Aldea](https://pypi.org/user/Raldea/), 
+[Javier Sanz](https://pypi.org/user/javibu13/),
+[Marius Crisan](https://pypi.org/user/mariuscrsn/)
