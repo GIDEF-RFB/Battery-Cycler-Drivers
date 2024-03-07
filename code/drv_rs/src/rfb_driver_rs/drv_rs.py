@@ -242,8 +242,7 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
             - volt_ref (int): Voltage reference in milivolts.
         '''
         log.debug("Set CV mode...")
-        if volt_ref > self.properties.max_volt_limit:
-            volt_ref = self.properties.max_volt_limit
+        volt_ref = min(volt_ref, self.properties.max_volt_limit)
         voltage = float(volt_ref / _MILI_UNITS)
         if voltage > 0.0:
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
@@ -263,8 +262,7 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
             - curr_ref (int): Current reference.
         '''
         log.debug("Set CC mode...")
-        if curr_ref > self.properties.max_current_limit:
-            curr_ref = self.properties.max_current_limit
+        curr_ref = min(curr_ref, self.properties.max_current_limit)
         current = float(curr_ref / _MILI_UNITS)
 
         if current > 0.0:
