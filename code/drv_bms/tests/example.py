@@ -17,15 +17,15 @@ from threading import Event
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
 path.append(os.getcwd())
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels='../log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
-from can_sniffer import DrvCanNodeC
+from rfb_can_sniffer import DrvCanNodeC
 #######################          MODULE IMPORTS          #######################
-from src.wattrex_driver_bms import DrvBmsDeviceC # pylint: disable=wrong-import-position
+from src.rfb_driver_bms import DrvBmsDeviceC # pylint: disable=wrong-import-position
 
 #######################              ENUMS               #######################
 _CAN_ID = 4
