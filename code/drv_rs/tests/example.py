@@ -14,19 +14,19 @@ import time
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
 sys.path.append(os.getcwd())
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels= 'code/log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC
+from rfb_scpi_sniffer import DrvScpiSerialConfC
 from serial import PARITY_ODD
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_rs/')
-from src.wattrex_driver_rs import DrvRsDeviceC
-# from wattrex_driver_rs import DrvRsDeviceC
+from src.rfb_driver_rs import DrvRsDeviceC
+# from rfb_driver_rs import DrvRsDeviceC
 
 #######################              ENUMS               #######################
 __SERIAL_PORT = '/dev/wattrex/loads/RS_79E047AE41D5'
