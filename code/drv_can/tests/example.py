@@ -10,7 +10,7 @@ import os
 from threading import Event
 import time
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import sys_log_logger_get_module_logger, SysLogLoggerC, Logger
+from rfb_logger_tool import sys_log_logger_get_module_logger, SysLogLoggerC, Logger
 
 #######################       LOGGER CONFIGURATION       #######################
 cycler_logger = SysLogLoggerC(file_log_levels='code/log_config.yaml')
@@ -18,8 +18,8 @@ log: Logger = sys_log_logger_get_module_logger(__name__)
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_can/')
-from system_shared_tool import SysShdIpcChanC
-from src.can_sniffer import DrvCanCmdDataC, DrvCanCmdTypeE, DrvCanFilterC, DrvCanNodeC,\
+from rfb_shared_tool import SysShdIpcChanC
+from src.rfb_can_sniffer import DrvCanCmdDataC, DrvCanCmdTypeE, DrvCanFilterC, DrvCanNodeC,\
                             DrvCanMessageC
 
 #######################            FUNCTIONS             #######################
