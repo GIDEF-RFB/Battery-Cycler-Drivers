@@ -10,7 +10,7 @@ from __future__ import annotations
 #######################         GENERIC IMPORTS          #######################
 from enum import Enum
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC()
 log = sys_log_logger_get_module_logger(__name__)
