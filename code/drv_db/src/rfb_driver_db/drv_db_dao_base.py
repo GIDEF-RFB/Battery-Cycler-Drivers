@@ -18,7 +18,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.declarative import declared_attr
 
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import Logger, sys_log_logger_get_module_logger
+from rfb_logger_tool import Logger, sys_log_logger_get_module_logger
 log: Logger = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
