@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 # users can install this project, e.g.:
 #
 # $ pip install <sampleproject>
-name = "rfb_driver_bases"
+name = "rfb_driver_base"
 
 # Versions should comply with PEP 440:
 # https://www.python.org/dev/peps/pep-0440/
@@ -163,6 +163,6 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools_scm]
 root = "../../"
-write_to = "code/drv_base/src/rfb_driver_bases/__version__.py"
+write_to = "code/drv_base/src/rfb_driver_base/__version__.py"
 version_scheme="python-simplified-semver"
 normalize="True"
