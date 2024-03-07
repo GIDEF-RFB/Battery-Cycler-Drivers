@@ -10,7 +10,7 @@ from enum import Enum
 #######################       THIRD PARTY IMPORTS        #######################
 
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import Logger, sys_log_logger_get_module_logger
+from rfb_logger_tool import Logger, sys_log_logger_get_module_logger
 log: Logger = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
@@ -23,12 +23,12 @@ class DrvBasePwrModeE(Enum):
     '''
     Working modes of power devices.
     '''
-    DISABLE = 5
+    DISABLE = 4
     WAIT = 0
-    CC_MODE = 1
-    CV_MODE = 2
+    CV_MODE = 1
+    CC_MODE = 2
     CP_MODE = 3
-    CR_MODE = 4
+    CR_MODE = 5
 
 #######################             CLASSES              #######################
 
