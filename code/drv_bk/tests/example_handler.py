@@ -23,12 +23,12 @@ log = sys_log_logger_get_module_logger(__name__)
 
 from rfb_shared_tool import SysShdIpcChanC
 #######################          PROJECT IMPORTS         #######################
-from rfb-scpi_sniffer import DrvScpiSerialConfC, DrvScpiHandlerC
+from rfb_scpi_sniffer import DrvScpiSerialConfC, DrvScpiHandlerC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_bk/')
 from src.rfb_driver_bk import DrvBkModeE
-from rfb_driver_base import DrvBaseStatusE
+from rfb_driver_bases import DrvBaseStatusE
 
 #######################              ENUMS               #######################
 
