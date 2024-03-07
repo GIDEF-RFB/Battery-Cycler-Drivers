@@ -15,12 +15,12 @@ from time import sleep
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
 path.append(os.getcwd())
-from system_logger_tool import sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 log = sys_log_logger_get_module_logger(__name__)
-from system_shared_tool import SysShdIpcChanC # pylint: disable=wrong-import-position
+from rfb_shared_tool import SysShdIpcChanC # pylint: disable=wrong-import-position
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
+from rfb_scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
 from rfb_driver_base import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, DrvBasePwrDeviceC,
                                 DrvBasePwrPropertiesC, DrvBasePwrDataC)
 

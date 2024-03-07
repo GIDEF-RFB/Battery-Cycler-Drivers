@@ -16,15 +16,15 @@ from serial import Serial, PARITY_ODD
 
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
-from system_logger_tool import sys_log_logger_get_module_logger
+from rfb_logger_tool import sys_log_logger_get_module_logger
 if __name__ == '__main__':
-    from system_logger_tool import SysLogLoggerC
+    from rfb_logger_tool import SysLogLoggerC
     cycler_logger = SysLogLoggerC(file_log_levels= 'code/log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC
+from rfb_scpi_sniffer import DrvScpiSerialConfC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_bk/')

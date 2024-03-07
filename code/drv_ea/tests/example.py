@@ -14,18 +14,18 @@ import time
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
 sys.path.append(os.getcwd())
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels= 'code/log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC
+from rfb_scpi_sniffer import DrvScpiSerialConfC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_ea/')
 from src.rfb_driver_ea.drv_ea import DrvEaDeviceC
-from wattrex_driver_base import DrvBasePwrModeE
+from rfb_driver_base import DrvBasePwrModeE
 
 #######################              ENUMS               #######################
 
@@ -35,8 +35,8 @@ def main():
     '''
     Example usage of drv_ea with a source_ea device.
     '''
-    ea_scpi_conf = DrvScpiSerialConfC(port = '/dev/wattrex/source/EA_2963640425', separator='\n', baudrate=38400,
-                                            timeout=1, write_timeout=1)
+    ea_scpi_conf = DrvScpiSerialConfC(port = '/dev/wattrex/source/EA_2963640425', separator='\n',
+                                      baudrate=38400, timeout=1, write_timeout=1)
 
     source = DrvEaDeviceC(config = ea_scpi_conf)
 
