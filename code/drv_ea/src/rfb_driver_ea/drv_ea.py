@@ -308,8 +308,7 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         curr_ref = abs(curr_ref)
         self.__change_last_mode(DrvBasePwrModeE.CC_MODE)
         current = round(float(curr_ref) / _MILI_UNITS, 2)
-        if current > self.properties.max_current_limit:
-            current = self.properties.max_current_limit
+        current = min(self.properties.max_current_limit,current)
         if voltage_limit is None or voltage_limit > self.properties.max_volt_limit:
             voltage_limit = self.properties.max_volt_limit
         voltage = round(float(voltage_limit / _MILI_UNITS), 2)
