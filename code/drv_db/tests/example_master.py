@@ -12,9 +12,9 @@ from datetime import datetime
 #######################       THIRD PARTY IMPORTS        #######################
 from sqlalchemy import select
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import sys_log_logger_get_module_logger
+from rfb_logger_tool import sys_log_logger_get_module_logger
 if __name__ == '__main__':
-    from system_logger_tool import SysLogLoggerC
+    from rfb_logger_tool import SysLogLoggerC
     cycler_logger = SysLogLoggerC(file_log_levels="code/log_config.yaml")
 log = sys_log_logger_get_module_logger(__name__)
 
@@ -22,7 +22,7 @@ log = sys_log_logger_get_module_logger(__name__)
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/')
-from drv_db.src.wattrex_driver_db import DrvDbSqlEngineC, DrvDbTypeE, DrvDbMasterExperimentC, \
+from drv_db.src.rfb_driver_db import DrvDbSqlEngineC, DrvDbTypeE, DrvDbMasterExperimentC, \
     DrvDbMasterGenericMeasureC, DrvDbMasterStatusC, DrvDbMasterExtendedMeasureC,\
     DrvDbAlarmC, DrvDbBatteryC, DrvDbInstructionC
 

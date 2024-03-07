@@ -7,3 +7,7 @@ and associated experiment profiles are also housed. Additionally, it contains ge
 power metrics captured during experiment runs, complemented by custom measures confgiured 
 by the user.
 
+Co-authors:
+[Roberto Aldea](https://pypi.org/user/Raldea/), 
+[Javier Sanz](https://pypi.org/user/javibu13/),
+[Marius Crisan](https://pypi.org/user/mariuscrsn/)
