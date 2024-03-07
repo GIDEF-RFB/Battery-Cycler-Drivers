@@ -10,15 +10,15 @@ from __future__ import annotations
 #######################         GENERIC IMPORTS          #######################
 from enum import Enum
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC()
 log = sys_log_logger_get_module_logger(__name__)
-from system_shared_tool import SysShdIpcChanC
+from rfb_shared_tool import SysShdIpcChanC
 
 #######################       THIRD PARTY IMPORTS        #######################
 from bitarray.util import ba2int, int2ba
-from can_sniffer import DrvCanMessageC, DrvCanCmdDataC, DrvCanCmdTypeE, DrvCanFilterC
+from rfb_can_sniffer import DrvCanMessageC, DrvCanCmdDataC, DrvCanCmdTypeE, DrvCanFilterC
 
 #######################          MODULE IMPORTS          #######################
 from .drv_epc_common import (DrvEpcDataC, DrvEpcDataCtrlC, DrvEpcPropertiesC, DrvEpcStatusC,

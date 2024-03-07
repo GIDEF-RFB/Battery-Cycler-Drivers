@@ -18,15 +18,15 @@ from subprocess import run, PIPE
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
 sys.path.append(os.getcwd())  #get absolute path
 
-from system_logger_tool import sys_log_logger_get_module_logger
+from rfb_logger_tool import sys_log_logger_get_module_logger
 if __name__ == '__main__':
-    from system_logger_tool import SysLogLoggerC
+    from rfb_logger_tool import SysLogLoggerC
     cycler_logger = SysLogLoggerC(file_log_levels= '../log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          MODULE IMPORTS          #######################
-from can_sniffer import DrvCanNodeC
-from src.wattrex_driver_epc import DrvEpcDeviceC, DrvEpcLimitE, DrvEpcModeE
+from rfb_can_sniffer import DrvCanNodeC
+from src.rfb_driver_epc import DrvEpcDeviceC, DrvEpcLimitE, DrvEpcModeE
 #######################          PROJECT IMPORTS         #######################
 
 #######################              ENUMS               #######################
