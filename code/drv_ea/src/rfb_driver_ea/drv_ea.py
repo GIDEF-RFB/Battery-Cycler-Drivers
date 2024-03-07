@@ -21,7 +21,7 @@ from rfb_shared_tool import SysShdIpcChanC # pylint: disable=wrong-import-positi
 
 #######################          PROJECT IMPORTS         #######################
 from rfb_scpi_sniffer import DrvScpiSerialConfC, DrvScpiCmdDataC, DrvScpiCmdTypeE
-from rfb_driver_base import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, DrvBasePwrDeviceC,
+from rfb_driver_bases import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, DrvBasePwrDeviceC,
                                 DrvBasePwrPropertiesC, DrvBasePwrDataC)
 
 #######################          MODULE IMPORTS          #######################

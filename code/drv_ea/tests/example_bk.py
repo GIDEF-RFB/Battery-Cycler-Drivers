@@ -20,7 +20,7 @@ if __name__ == '__main__':
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC
+from rfb_scpi_sniffer import DrvScpiSerialConfC
 
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_ea/')

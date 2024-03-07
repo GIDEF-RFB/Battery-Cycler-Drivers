@@ -25,7 +25,7 @@ from rfb_scpi_sniffer import DrvScpiSerialConfC
 #######################          MODULE IMPORTS          #######################
 sys.path.append(os.getcwd()+'/code/drv_ea/')
 from src.rfb_driver_ea.drv_ea import DrvEaDeviceC
-from rfb_driver_base import DrvBasePwrModeE
+from rfb_driver_bases import DrvBasePwrModeE
 
 #######################              ENUMS               #######################
 
