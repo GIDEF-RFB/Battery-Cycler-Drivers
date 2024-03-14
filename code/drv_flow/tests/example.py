@@ -15,16 +15,16 @@ from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 
 #######################      SYSTEM ABSTRACTION IMPORTS  #######################
 path.append(os.getcwd())
-from system_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
+from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
     cycler_logger = SysLogLoggerC(file_log_levels='./log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
-from scpi_sniffer import DrvScpiSerialConfC # pylint: disable=wrong-import-position
+from rfb_scpi_sniffer import DrvScpiSerialConfC # pylint: disable=wrong-import-position
 
 #######################          MODULE IMPORTS          #######################
-from drv_flow.src.wattrex_driver_flow import DrvFlowDeviceC # pylint: disable=wrong-import-position
+from drv_flow.src.rfb_driver_flow import DrvFlowDeviceC # pylint: disable=wrong-import-position
 
 #######################              ENUMS               #######################
 
