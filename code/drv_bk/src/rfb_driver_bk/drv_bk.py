@@ -182,13 +182,13 @@ class DrvBkDeviceC(DrvBasePwrDeviceC):
                             self.last_data.status = DrvBaseStatusE.COMM_ERROR #pylint: disable=attribute-defined-outside-init
                         elif len(data.split(',')) == 3:
                             data = data.split(',')
-                            self.properties = DrvBkPropertiesC(model = data[0],
+                            self.properties = DrvBkPropertiesC(model = data[0].split(' ')[0],
                                             serial_number = data[1],
                                             max_volt = DEFAULT_MAX_VOLT * _MILI_UNITS,
                                             max_curr = DEFAULT_MAX_CURR * _MILI_UNITS,
                                             max_pwr  = _MAX_PWR * _MILI_UNITS)
                             log.debug(f"Serial number: {data[-1]}")
-                            log.debug(f"Model: {data[0]}")
+                            log.debug(f"Model: {data[0].split(' ')[0]}")
                         log.debug(f"Response: {data}")
                     else:
                         if self.last_data.mode in (DrvBkModeE.VOLT_DC, DrvBkModeE.VOLT_AC):

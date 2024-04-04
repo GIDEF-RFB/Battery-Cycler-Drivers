@@ -53,8 +53,11 @@ def main():
     """
     Main function to test the driver for the multimeter using also a source.
     """
+    # Configure bk driver
     bk_scpi_conf = DrvScpiSerialConfC(port = '/dev/wattrex/bk/BK_0001', separator='\n',
-                                      baudrate=38200, timeout=1, write_timeout=1)
+                                      baudrate=38400, timeout=1, write_timeout=1)
+    drv = DrvBkDeviceC(config= bk_scpi_conf)
+    # Configure ea
     ea_scpi_conf = DrvScpiSerialConfC(port = '/dev/wattrex/source/EA_2963640425', separator='\n',
                                       baudrate=9600, timeout=1, write_timeout=1, parity= PARITY_ODD)
     ea_serial: Serial = Serial(port                 = ea_scpi_conf.port,
@@ -66,7 +69,6 @@ def main():
                             write_timeout           = ea_scpi_conf.write_timeout,
                             inter_byte_timeout      = ea_scpi_conf.inter_byte_timeout,
                             xonxoff= True, rtscts= False, dsrdtr= False)
-    drv = DrvBkDeviceC(config= bk_scpi_conf)
     try:
         disable_source(ea_serial)
         init = time.time()

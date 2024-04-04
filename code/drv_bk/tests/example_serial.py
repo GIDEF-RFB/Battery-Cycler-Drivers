@@ -32,7 +32,7 @@ sys.path.append(os.getcwd()+'/code/drv_bk/')
 
 #######################             CLASSES              #######################
 def main():
-    bk_scpi_conf = DrvScpiSerialConfC(port = '/dev/ttyUSB0', separator='\n', baudrate=38200,
+    bk_scpi_conf = DrvScpiSerialConfC(port = '/dev/ttyUSB0', separator='\n', baudrate=38400,
                                             timeout=1, write_timeout=1)
     try:
         "Main function"
