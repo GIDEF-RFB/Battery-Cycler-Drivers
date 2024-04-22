@@ -333,8 +333,6 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         else:
             current = 0
             voltage = 0
-        log.critical(self.properties.model)
-        log.critical(self.properties.model.startswith("PSB"))
         if self.properties.model.startswith("PSB"):
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
                 port = self.__port, payload = "SINK:"+_ScpiCmds.SEND_CURR.value + str(current))
