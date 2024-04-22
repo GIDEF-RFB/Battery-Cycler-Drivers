@@ -27,10 +27,9 @@ from rfb_driver_bases import (DrvBaseStatusE, DrvBaseStatusC, DrvBasePwrModeE, D
 #######################          MODULE IMPORTS          #######################
 ######################             CONSTANTS              ######################
 from .context import (DEFAULT_TX_CHAN, DEFAULT_RX_CHAN, DEFAULT_MAX_MSG, DEFAULT_MAX_MESSAGE_SIZE,
-                      DEFAULT_MAX_READS)
+                      DEFAULT_MAX_READS, DEFAULT_MAX_REQUESTS)
 #######################              ENUMS               #######################
 _MILI_UNITS = 1000
-
 
 class _ScpiCmds(Enum):
     "Modes of the device"
@@ -46,6 +45,7 @@ class _ScpiCmds(Enum):
     OUTPUT_OFF = 'OUTPut: OFF'
     SEND_CURR = 'CURRent '
     SEND_VOLT = 'VOLTage '
+    CHECK_ERROR = ':SYST:ERR?'
 
 
 #######################             CLASSES              #######################
@@ -125,6 +125,7 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         self.__tx_chan.send_data(add_msg)
         self.__rx_chan.delete_until_last()
         self.__wait_4_response: bool = False
+        self.__request_data: int = 0
         self.__last_mode: DrvBasePwrModeE = DrvBasePwrModeE.DISABLE
         self.last_data: DrvEaDataC = DrvEaDataC(mode = DrvBasePwrModeE.DISABLE,
                                                 status = DrvBaseStatusE.OK,
@@ -164,13 +165,14 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
             if msg is not None and msg.data_type == DrvScpiCmdTypeE.RESP: #pylint: disable=too-many-nested-blocks
                 if hasattr(msg, 'status') and msg.status.value == DrvBaseStatusE.COMM_ERROR: #pylint: disable=attribute-defined-outside-init
                     log.critical("ERROR READING DEVICE")
-                    self.last_data.status = DrvBaseStatusE.COMM_ERROR #pylint: disable=attribute-defined-outside-init
+                    self.last_data.status = DrvBaseStatusC(DrvBaseStatusE.COMM_ERROR) #pylint: disable=attribute-defined-outside-init
                 for data in msg.payload: #pylint: disable=too-many-nested-blocks #pylint: disable=attribute-defined-outside-init
                     if len(data) >0 and not str(data).startswith(":"):
                         if 'No error' in data:
-                            self.last_data.status = DrvBaseStatusE.OK #pylint: disable=attribute-defined-outside-init
+                            self.last_data.status = DrvBaseStatusC(DrvBaseStatusE.OK) #pylint: disable=attribute-defined-outside-init
                         elif all (x in data for x in ("error", "Error", "ERROR")):
-                            self.last_data.status = DrvBaseStatusE.COMM_ERROR #pylint: disable=attribute-defined-outside-init
+                            log.error(f"Error reading device: {data}")
+                            self.last_data.status = DrvBaseStatusC(DrvBaseStatusE.COMM_ERROR) #pylint: disable=attribute-defined-outside-init
                         elif 'OFF' in data:
                             self.last_data.mode = self.__last_mode #pylint: disable=attribute-defined-outside-init
                         elif ('ON' in data and self.last_data.mode in (DrvBasePwrModeE.WAIT,
@@ -282,13 +284,21 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
             - None.
         '''
         log.debug("Get meas...")
+        if self.__request_data >= DEFAULT_MAX_REQUESTS:
+            self.__wait_4_response = False
+            self.__request_data = 0
+        self.__tx_chan.close()
+        self.__tx_chan = SysShdIpcChanC(name = DEFAULT_TX_CHAN)
         if not self.__wait_4_response:
             self.__tx_chan.send_data(DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE_READ,
                                 port = self.__port,
                                 payload = _ScpiCmds.GET_MEAS.value))
             self.__wait_4_response = True
+        else:
+            self.__request_data += 1
         self.read_buffer()
         return self.last_data
+
 
 
     def set_cc_mode(self, curr_ref: int, voltage_limit: int|None= None) -> None:
@@ -305,6 +315,8 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         Raises:
             - None
         '''
+        self.__tx_chan.close()
+        self.__tx_chan = SysShdIpcChanC(name = DEFAULT_TX_CHAN)
         curr_ref = abs(curr_ref)
         self.__change_last_mode(DrvBasePwrModeE.CC_MODE)
         current = round(float(curr_ref) / _MILI_UNITS, 2)
@@ -360,6 +372,8 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         Raises:
             - None
         '''
+        self.__tx_chan.close()
+        self.__tx_chan = SysShdIpcChanC(name = DEFAULT_TX_CHAN)
         self.__change_last_mode(DrvBasePwrModeE.CV_MODE)
         voltage = round(float(volt_ref)/_MILI_UNITS, 2)
         current = round(float(current_limit/_MILI_UNITS), 2)
@@ -406,7 +420,9 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         Raises:
             - None 
         '''
-        log.critical("Disabling SOURCE...")
+        log.debug("Disabling SOURCE...")
+        self.__tx_chan.close()
+        self.__tx_chan = SysShdIpcChanC(name = DEFAULT_TX_CHAN)
         self.__change_last_mode(DrvBasePwrModeE.WAIT)
         msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
                                 port = self.__port,
@@ -425,7 +441,9 @@ class DrvEaDeviceC(DrvBasePwrDeviceC):
         Raises:
             - None 
         '''
-        log.critical("Disabling SOURCE...")
+        log.debug("Disabling SOURCE...")
+        self.__tx_chan.close()
+        self.__tx_chan = SysShdIpcChanC(name = DEFAULT_TX_CHAN)
         self.__change_last_mode(DrvBasePwrModeE.DISABLE)
         msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
                                 port = self.__port,

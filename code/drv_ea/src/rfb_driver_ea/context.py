@@ -24,10 +24,11 @@ from rfb_config_tool import sys_conf_update_config_params
 ######################             CONSTANTS              ######################
 # For further information check out README.md
 DEFAULT_MAX_MSG : int           = 100 # Max number of allowed message per chan
-DEFAULT_MAX_MESSAGE_SIZE : int  = 400 # Size of message sent through IPC message queue
+DEFAULT_MAX_MESSAGE_SIZE : int  = 550 # Size of message sent through IPC message queue
 DEFAULT_TX_CHAN : str           = 'TX_SCPI' #'TX_SCPI' # Name of the TX channel in CAN
-DEFAULT_RX_CHAN: str            = 'RX_SCPI_EA'  #Name of the RX channel for epc
-DEFAULT_MAX_READS: int = 10
+DEFAULT_RX_CHAN: str            = 'RX_SCPI'  #Name of the RX channel for epc
+DEFAULT_MAX_READS: int          = 10 # Number of maximum reads made when reading the queue
+DEFAULT_MAX_REQUESTS: int       = 10 # Number of requests made after sending again the message
 
 CONSTANTS_NAMES = ('DEFAULT_MAX_READS','DEFAULT_MAX_MSG', 'DEFAULT_MAX_MESSAGE_SIZE',
                    'DEFAULT_TX_CHAN', 'DEFAULT_RX_CHAN')
