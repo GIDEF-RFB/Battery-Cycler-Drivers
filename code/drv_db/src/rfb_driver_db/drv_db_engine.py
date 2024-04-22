@@ -10,13 +10,13 @@ Raises:
 from __future__ import annotations
 #######################         GENERIC IMPORTS          #######################
 from typing import Any
+from datetime import datetime
 
 #######################       THIRD PARTY IMPORTS        #######################
 # SQL Alchemy
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-from datetime import datetime
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
 from rfb_config_tool import sys_conf_read_config_params
 from rfb_logger_tool import Logger, sys_log_logger_get_module_logger
