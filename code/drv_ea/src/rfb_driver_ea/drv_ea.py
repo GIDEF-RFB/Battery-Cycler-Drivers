@@ -88,7 +88,7 @@ class DrvEaDataC(DrvBasePwrDataC):
                          current = current, power = power)
 
 
-class DrvEaDeviceC(DrvBasePwrDeviceC):
+class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attributes
     "Principal class of ea power supply device"
     __instances = []
 
