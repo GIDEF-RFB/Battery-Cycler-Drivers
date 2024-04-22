@@ -16,7 +16,7 @@ from typing import Any
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
-
+from datetime import datetime
 #######################    SYSTEM ABSTRACTION IMPORTS    #######################
 from rfb_config_tool import sys_conf_read_config_params
 from rfb_logger_tool import Logger, sys_log_logger_get_module_logger
@@ -56,25 +56,21 @@ class DrvDbSqlEngineC:
             section = 'cache_db'
         if db_type == DrvDbTypeE.MASTER_DB:
             section = 'master_db'
+        self.section = section
         try:
-            params = sys_conf_read_config_params(filename=config_file, section= section)
+            params = sys_conf_read_config_params(filename=config_file, section= self.section)
 
             # create engine
-            if db_type == DrvDbTypeE.CACHE_DB:
-                url = 'mysql+mysqlconnector://'
-            elif db_type == DrvDbTypeE.MASTER_DB:
-                url = 'mysql+mysqlconnector://'
-                section = 'cache_db'
-            else:
-                raise ConnectionError("Data base type or engine not supported")
+            url = 'mysql+mysqlconnector://' + params['user'] + ':'\
+                    + params['password'] + '@' + params['host'] + ':'\
+                    + str(params['port']) + '/' + params['database']
 
-            url += params['user'] + ':' + params['password'] + '@' \
-                    + params['host'] + ':' + str(params['port']) + '/' + params['database']
             log.debug(f"Creating database engine with url: [{url}]")
             self.engine: Engine = create_engine(url=url, echo=False, future=True)
             self.session : Session = Session(bind=self.engine, future=True)
             self.session.begin()
             self.n_resets = 0
+            self.__last_connection = datetime.now()
 
         except Exception as err:
             log.error(msg="Error on DB Session creation. Please check DB " +\
@@ -97,6 +93,7 @@ class DrvDbSqlEngineC:
         '''
         try:
             self.session.commit()
+            self.__last_connection = datetime.now()
         except Exception as err:
             log.critical(err)
             log.critical("Error while commiting change to DB. Performing rollback...")
@@ -104,6 +101,15 @@ class DrvDbSqlEngineC:
             if raise_exception:
                 raise err
 
+    def check_connection(self) -> None:
+        '''
+        Check when has been the last connection with the database and reconnect with it
+        '''
+        elapsed_time = datetime.now() - self.__last_connection
+        if elapsed_time.seconds > 30:
+            log.warning((f"Database {self.section} last connection "
+                         "was 30s ago, trying to connect again"))
+            self.__reset_engine()
 
     def close_connection(self) -> None:
         '''
@@ -118,7 +124,7 @@ class DrvDbSqlEngineC:
         Create a new engine and initialize it
         '''
         params: dict[str, Any] = sys_conf_read_config_params(#pylint: disable=unsubscriptable-object
-            filename=self.config_file, section='database')
+            filename=self.config_file, section=self.section)
 
         url = 'mysql+mysqlconnector://' + params['user'] + ':'\
             + params['password'] + '@' + params['host'] + ':'\
@@ -126,6 +132,7 @@ class DrvDbSqlEngineC:
         self.engine = create_engine(url, echo=False, future=True)
         self.session = Session(self.engine, future=True)
         self.session.begin()
+        self.__last_connection = datetime.now()
 
 
     def reset(self) -> None:
