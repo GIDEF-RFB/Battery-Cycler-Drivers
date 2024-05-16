@@ -48,7 +48,6 @@ class DrvScpiNodeC(SysShdNodeC):
         self.tx_scpi: SysShdIpcChanC = SysShdIpcChanC(name = DEFAULT_TX_CHAN,
                                                       max_msg= DEFAULT_CHAN_NUM_MSG,
                                                       max_message_size= DEFAULT_MAX_MSG_SIZE)
-        self.tx_scpi.delete_until_last()
         super().__init__(name = name, cycle_period = cycle_period,\
                         working_flag = working_flag)
         signal(SIGINT, self.signal_handler)
@@ -125,9 +124,22 @@ class DrvScpiNodeC(SysShdNodeC):
                         f"Command to apply: {command.data_type.name}"))
                 self.__apply_command(command)
             else:
-                log.error("First add device.")
+                if command.data_type is not DrvScpiCmdTypeE.DEL_DEV:
+                    self.__error_device_not_found(command)
+                    log.error("First add device.")
         self.__receive_response()
 
+    def __error_device_not_found(self, cmd: DrvScpiCmdDataC) -> None:
+        '''Error message when the device is not found.
+        Args:
+            - cmd (DrvScpiCmdDataC): Message to apply.
+        '''
+
+        queue = SysShdIpcChanC(name = cmd.rx_chan_name)
+        queue.send_data(DrvScpiCmdDataC(data_type= DrvScpiCmdTypeE.ERROR, port="Device not found",
+                                        last_order= cmd.data_type, payload=cmd.payload))
+        queue.close()
+        log.error(f"Device not found: {cmd.port}")
 
     def stop(self) -> None:
         '''Stop the SCPI node.
@@ -140,8 +152,8 @@ class DrvScpiNodeC(SysShdNodeC):
         '''
         log.info("Stopping SCPI node...")
         for device in self.__used_dev.values():
+            device: DrvScpiHandlerC
             device.close()
-        self.working_flag.clear()
         self.__used_dev.clear()
         self.tx_scpi.terminate()
         log.info("SCPI node stopped")
@@ -169,4 +181,4 @@ class DrvScpiNodeC(SysShdNodeC):
             - None.
         '''
         log.info("control-c detected. Stopping SCPI node...")
-        self.stop()
+        self.working_flag.clear()

@@ -157,5 +157,5 @@ class DrvScpiHandlerC:
         Raises:
             - None.
         '''
-        self.__rx_chan.terminate()
+        self.__rx_chan.close()
         self.__serial.close()

@@ -30,6 +30,7 @@ class DrvScpiCmdTypeE(Enum):
     WRITE       = 2
     WRITE_READ  = 3
     RESP        = 4
+    ERROR       = 5
 
 #######################             CLASSES              #######################
 class DrvScpiCmdDataC:
