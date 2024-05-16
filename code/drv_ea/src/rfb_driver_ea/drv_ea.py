@@ -117,6 +117,7 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         self.__rx_chan = SysShdIpcChanC(name = DEFAULT_RX_CHAN+'_'+config.port.split('/')[-1],
                                       max_msg = DEFAULT_MAX_MSG,
                                       max_message_size = DEFAULT_MAX_MESSAGE_SIZE)
+        sleep(1)
         self.__port = config.port
         self.__config = config
         add_msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.ADD_DEV,
@@ -263,7 +264,7 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
             - ConnectionError: Device not found.
         '''
         #Model and serial number
-        msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE_READ, 
+        msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE_READ,
                 rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1],
                 port = self.__port, payload = _ScpiCmds.READ_INFO.value)
         self.__tx_chan.send_data(msg)
@@ -499,9 +500,9 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         '''
         self.disable()
         self.__tx_chan.send_data(DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                        rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1],
-                                        port = self.__port,
-                                        payload = _ScpiCmds.LOCK_OFF.value))
+                                    rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1],
+                                    port = self.__port,
+                                    payload = _ScpiCmds.LOCK_OFF.value))
         del_msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.DEL_DEV,
                                 port = self.__port) # pylint: disable=no-member
         self.__tx_chan.send_data(del_msg)
