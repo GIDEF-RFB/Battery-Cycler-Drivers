@@ -107,12 +107,13 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
                                       max_msg = DEFAULT_MAX_MSG,
                                       max_message_size = DEFAULT_MAX_MESSAGE_SIZE)
         self.__port = config.port
+        self.__config = config
         self.__separator = config.separator
         self.__wait_4_response = False
         add_msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.ADD_DEV,
-                                  port = config.port,
-                                  payload = config,
-                                  rx_chan_name = DEFAULT_RX_CHAN+'_'+config.port.split('/')[-1])
+                            port = config.port,
+                            payload = config,
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1])
         self.__tx_chan.send_data(add_msg)
         self.__rx_chan.delete_until_last()
         self.properties: DrvRsPropertiesC = DrvRsPropertiesC(model = None, serial_number = 0,
@@ -147,52 +148,65 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         i = 0
         while i < DEFAULT_MAX_READS and not self.__rx_chan.is_empty(): #pylint: disable=too-many-nested-blocks
             msg: DrvScpiCmdDataC = self.__rx_chan.receive_data_unblocking()
-            if msg is not None and msg.data_type == DrvScpiCmdTypeE.RESP:
-                if hasattr(msg, 'status') and msg.status.value == DrvBaseStatusE.COMM_ERROR: #pylint: disable=attribute-defined-outside-init
-                    log.critical("ERROR READING DEVICE")
-                    self.last_data.status = DrvBaseStatusE.COMM_ERROR
-                for data in msg.payload: #pylint: disable=too-many-nested-blocks #pylint: disable=attribute-defined-outside-init
-                    if len(data) >0 and not str(data).startswith(":"):
-                        if data.startswith('RS'):
-                            data = data.split(' ')
-                            self.properties.model = data[0] #pylint: disable=attribute-defined-outside-init
-                            self.properties.serial_number = data[2].split(':')[-1] #pylint: disable=attribute-defined-outside-init
-                            log.debug(f"Serial number: {data[2].split(':')[-1]}")
-                            log.debug(f"Model: {data[0]}")
-                        elif "W" in data and len(data.split('.')) == 2:
-                            power = int(float(data.replace('W','')) * _MILI_UNITS)
-                            if self.__wait_4_response:
-                                self.last_data.power = power #pylint: disable=attribute-defined-outside-init
-                                ##  Power is the one to set to false as is the last value requested
-                                if power <= 0:
-                                    self.last_data.mode = DrvBasePwrModeE.DISABLE
-                                self.__wait_4_response = False
-                                log.debug(f"Power: {power}")
-                            else:
-                                self.properties.max_power_limit = power #pylint: disable=attribute-defined-outside-init
-                        elif "V" in data and len(data.split('.')) == 2:
-                            volt = int(float(data.replace('V','')) * _MILI_UNITS)
-                            if self.__wait_4_response:
-                                self.last_data.voltage = volt #pylint: disable=attribute-defined-outside-init
-                                log.debug(f"Voltage: {volt}")
-                            else:
-                                self.properties.max_volt_limit = volt #pylint: disable=attribute-defined-outside-init
-                        elif "A" in data and len(data.split('.')) == 2:
-                            curr = int(float(data.replace('A','')) * _MILI_UNITS)
-                            if self.__wait_4_response:
-                                self.last_data.current = curr #pylint: disable=attribute-defined-outside-init
-                                log.debug(f"Current: {curr}")
-                            else:
-                                self.properties.max_current_limit = curr #pylint: disable=attribute-defined-outside-init
-                        elif "CV" in data:
-                            self.last_data.mode = DrvBasePwrModeE.CV_MODE
-                            log.debug(f"New mode set to: {self.last_data.mode}")
-                        elif "CC" in data:
-                            self.last_data.mode = DrvBasePwrModeE.CC_MODE
-                            log.debug(f"New mode set to: {self.last_data.mode}")
-                        elif "CW" in data:
-                            self.last_data.mode = DrvBasePwrModeE.CP_MODE
-                            log.debug(f"New mode set to: {self.last_data.mode}")
+            if msg is not None:
+                if msg.data_type == DrvScpiCmdTypeE.ERROR:
+                    log.critical("ERROR DEVICE NOT ADDED IN SCPI")
+                    add_msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.ADD_DEV,
+                                    port = self.__port,
+                                    payload = self.__config,
+                                    rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1])
+                    self.__tx_chan.send_data(add_msg)
+                    add_msg = DrvScpiCmdDataC(data_type = msg.last_order,
+                                    port = self.__port,
+                                    payload = msg.payload,
+                                    rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1])
+                    self.__tx_chan.send_data(add_msg)
+                elif msg.data_type == DrvScpiCmdTypeE.RESP:
+                    if hasattr(msg, 'status') and msg.status.value == DrvBaseStatusE.COMM_ERROR: #pylint: disable=attribute-defined-outside-init
+                        log.critical("ERROR READING DEVICE")
+                        self.last_data.status = DrvBaseStatusE.COMM_ERROR
+                    for data in msg.payload: #pylint: disable=too-many-nested-blocks #pylint: disable=attribute-defined-outside-init
+                        if len(data) >0 and not str(data).startswith(":"):
+                            if data.startswith('RS'):
+                                data = data.split(' ')
+                                self.properties.model = data[0] #pylint: disable=attribute-defined-outside-init
+                                self.properties.serial_number = data[2].split(':')[-1] #pylint: disable=attribute-defined-outside-init
+                                log.debug(f"Serial number: {data[2].split(':')[-1]}")
+                                log.debug(f"Model: {data[0]}")
+                            elif "W" in data and len(data.split('.')) == 2:
+                                power = int(float(data.replace('W','')) * _MILI_UNITS)
+                                if self.__wait_4_response:
+                                    self.last_data.power = power #pylint: disable=attribute-defined-outside-init
+                                    #Power is the one to set to false as is the last value requested
+                                    if power <= 0:
+                                        self.last_data.mode = DrvBasePwrModeE.DISABLE
+                                    self.__wait_4_response = False
+                                    log.debug(f"Power: {power}")
+                                else:
+                                    self.properties.max_power_limit = power #pylint: disable=attribute-defined-outside-init
+                            elif "V" in data and len(data.split('.')) == 2:
+                                volt = int(float(data.replace('V','')) * _MILI_UNITS)
+                                if self.__wait_4_response:
+                                    self.last_data.voltage = volt #pylint: disable=attribute-defined-outside-init
+                                    log.debug(f"Voltage: {volt}")
+                                else:
+                                    self.properties.max_volt_limit = volt #pylint: disable=attribute-defined-outside-init
+                            elif "A" in data and len(data.split('.')) == 2:
+                                curr = int(float(data.replace('A','')) * _MILI_UNITS)
+                                if self.__wait_4_response:
+                                    self.last_data.current = curr #pylint: disable=attribute-defined-outside-init
+                                    log.debug(f"Current: {curr}")
+                                else:
+                                    self.properties.max_current_limit = curr #pylint: disable=attribute-defined-outside-init
+                            elif "CV" in data:
+                                self.last_data.mode = DrvBasePwrModeE.CV_MODE
+                                log.debug(f"New mode set to: {self.last_data.mode}")
+                            elif "CC" in data:
+                                self.last_data.mode = DrvBasePwrModeE.CC_MODE
+                                log.debug(f"New mode set to: {self.last_data.mode}")
+                            elif "CW" in data:
+                                self.last_data.mode = DrvBasePwrModeE.CP_MODE
+                                log.debug(f"New mode set to: {self.last_data.mode}")
             elif msg is None:
                 pass
             else:
@@ -204,13 +218,14 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         '''
         #disable manual inputs
         msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                              port = self.__port,
-                              payload = (f"{_ScpiCmds.LOCK_ON.value}{self.__separator}"
-                                         f"{_ScpiCmds.OUTPUT_OFF.value}{self.__separator}"
-                                         f"{_ScpiCmds.READ_INFO.value}{self.__separator}"
-                                         f"{_ScpiCmds.MAX_CURRENT.value}{self.__separator}"
-                                         f"{_ScpiCmds.MAX_VOLTAGE.value}{self.__separator}"
-                                         f"{_ScpiCmds.MAX_POWER.value}"))
+                            port = self.__port,
+                            payload = (f"{_ScpiCmds.LOCK_ON.value}{self.__separator}"
+                                        f"{_ScpiCmds.OUTPUT_OFF.value}{self.__separator}"
+                                        f"{_ScpiCmds.READ_INFO.value}{self.__separator}"
+                                        f"{_ScpiCmds.MAX_CURRENT.value}{self.__separator}"
+                                        f"{_ScpiCmds.MAX_VOLTAGE.value}{self.__separator}"
+                                        f"{_ScpiCmds.MAX_POWER.value}"),
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1])
         self.__tx_chan.send_data(msg)
         self.read_buffer()
 
@@ -225,11 +240,12 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         '''
         if not self.__wait_4_response:
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE_READ,
-                                port = self.__port,
-                                payload = (f"{_ScpiCmds.GET_MODE.value}{self.__separator}"
-                                            f"{_ScpiCmds.GET_CURR.value}{self.__separator}"
-                                            f"{_ScpiCmds.GET_VOLT.value}{self.__separator}"
-                                            f"{_ScpiCmds.GET_POW.value}"))
+                            port = self.__port,
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            payload = (f"{_ScpiCmds.GET_MODE.value}{self.__separator}"
+                                        f"{_ScpiCmds.GET_CURR.value}{self.__separator}"
+                                        f"{_ScpiCmds.GET_VOLT.value}{self.__separator}"
+                                        f"{_ScpiCmds.GET_POW.value}"))
             self.__tx_chan.send_data(msg)
             self.__wait_4_response = True
         # Wait until receive the message
@@ -246,9 +262,10 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         voltage = float(volt_ref / _MILI_UNITS)
         if voltage > 0.0:
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                    port = self.__port,
-                                    payload = (f":VOLT {round(voltage, 4)}V{self.__separator}"
-                                                f"{_ScpiCmds.OUTPUT_ON.value}"))
+                            port = self.__port,
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            payload = (f":VOLT {round(voltage, 4)}V{self.__separator}"
+                                        f"{_ScpiCmds.OUTPUT_ON.value}"))
             self.__tx_chan.send_data(msg)
             self.last_data.status = DrvBaseStatusC(DrvBaseStatusE.OK)
         else:
@@ -267,12 +284,14 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
 
         if current > 0.0:
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                    port = self.__port,
-                                    payload = f':CURR {round(current, 4)}A')
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            port = self.__port,
+                            payload = f':CURR {round(current, 4)}A')
             self.__tx_chan.send_data(msg)
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                    port = self.__port,
-                                    payload = _ScpiCmds.OUTPUT_ON.value)
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            port = self.__port,
+                            payload = _ScpiCmds.OUTPUT_ON.value)
 
             self.__tx_chan.send_data(msg)
             self.last_data.status = DrvBaseStatusC(DrvBaseStatusE.OK)
@@ -295,8 +314,9 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
             - None
         '''
         msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                port = self.__port,
-                                payload = _ScpiCmds.OUTPUT_OFF.value)
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            port = self.__port,
+                            payload = _ScpiCmds.OUTPUT_OFF.value)
         self.__tx_chan.send_data(msg)
         # self.last_data.mode = DrvBasePwrModeE.WAIT
 
@@ -313,8 +333,9 @@ class DrvRsDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         log.info("Close the load device...")
         self.disable()
         msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
-                                port = self.__port,
-                                payload = _ScpiCmds.LOCK_OFF.value)
+                            rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__config.port.split('/')[-1],
+                            port = self.__port,
+                            payload = _ScpiCmds.LOCK_OFF.value)
         self.__tx_chan.send_data(msg)
         self.__tx_chan.send_data(DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.DEL_DEV,
                                 port = self.__port))
