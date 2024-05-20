@@ -165,7 +165,7 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         while i < DEFAULT_MAX_READS and not self.__rx_chan.is_empty(): #pylint: disable=too-many-nested-blocks
             msg: DrvScpiCmdDataC = self.__rx_chan.receive_data_unblocking()
             if msg is not None:
-                log.critical(f"Message received: {msg.data_type.name}")
+                log.debug(f"Message received: {msg.data_type.name}")
                 if msg.data_type == DrvScpiCmdTypeE.ERROR:
 
                     log.critical("ERROR DEVICE NOT ADDED IN SCPI")
@@ -354,8 +354,6 @@ class DrvEaDeviceC(DrvBasePwrDeviceC): #pylint: disable=too-many-instance-attrib
         else:
             current = 0
             voltage = 0
-        log.critical(self.properties.model)
-        log.critical(self.properties.model.startswith("PSB"))
         if self.properties.model.startswith("PSB"):
             msg = DrvScpiCmdDataC(data_type = DrvScpiCmdTypeE.WRITE,
                 rx_chan_name = DEFAULT_RX_CHAN+'_'+self.__port.split('/')[-1],
