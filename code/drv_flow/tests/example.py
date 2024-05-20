@@ -7,6 +7,7 @@ from __future__ import annotations
 
 #######################         GENERIC IMPORTS          #######################
 import os
+import sys
 from sys import path
 from time import sleep
 from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
@@ -17,20 +18,20 @@ from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 path.append(os.getcwd())
 from rfb_logger_tool import SysLogLoggerC, sys_log_logger_get_module_logger # pylint: disable=wrong-import-position
 if __name__ == '__main__':
-    cycler_logger = SysLogLoggerC(file_log_levels='./log_config.yaml')
+    cycler_logger = SysLogLoggerC(file_log_levels='code/log_config.yaml')
 log = sys_log_logger_get_module_logger(__name__)
 
 #######################          PROJECT IMPORTS         #######################
 from rfb_scpi_sniffer import DrvScpiSerialConfC # pylint: disable=wrong-import-position
 
 #######################          MODULE IMPORTS          #######################
-from drv_flow.src.rfb_driver_flow import DrvFlowDeviceC # pylint: disable=wrong-import-position
+sys.path.append(os.getcwd()+'/code/drv_flow/')
+from src.rfb_driver_flow import DrvFlowDeviceC # pylint: disable=wrong-import-position
 
 #######################              ENUMS               #######################
 
 #######################             CLASSES              #######################
-__SERIAL_PORT = '/dev/ttyACM0'
-__RX_CHAN_NAME = 'rx_scpi_flow'
+__SERIAL_PORT = '/dev/wattrex/arduino/ARDUINO_24233323435351611252'
 
 def example_flowmeter():
     '''
@@ -46,13 +47,12 @@ def example_flowmeter():
                                         write_timeout = None,
                                         inter_byte_timeout  = None)
 
-    flowmeter = DrvFlowDeviceC(config = flow_conf_scpi,
-                               rx_chan_name = __RX_CHAN_NAME)
+    flowmeter = DrvFlowDeviceC(config = flow_conf_scpi)
     log.info(f"Device: {flowmeter.device_id} \t Firmware: {flowmeter.firmware_version}") # pylint: disable=logging-fstring-interpolation
 
     cont = 0
     while cont < 10:
-        sleep(0.2)
+        sleep(1.5)
         log.info(f"Get meas: {flowmeter.get_data()}") # pylint: disable=logging-fstring-interpolation
         cont += 1
 
