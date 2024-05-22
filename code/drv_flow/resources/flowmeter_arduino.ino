@@ -1,149 +1,88 @@
+#include <stdio.h>
+const int pinNegativo = 2; // El pin digital donde está conectada la salida del caudalímetro del electrolito negativo.
+const int pinPositivo = 7; // El pin digital donde está conectada la salida del caudalímetro del electrolito positivo.
 // Digital pin used for auxiliar flowmeter
-#define pin_aux 2
-#define FACTOR_MILIS 1000
-#define SACLAR_US_2_FREQ 500000 // Factor to convert us to Hz -> 1.000.000/ (2 * semiperiod)
-#define FLOW_MAX 10 // 10 L/min 
-#define FREQ_MAX 235 // Freq for 10L/min
+#define pinPositivo 7
+#define pinNegativo 2
+
 #define DEVICE_NUMBER 1
 #define FIRMWARE_VERSION "2"
 #define ENDING_CHARS "\n"
 #define BAUDRATE 19200
 #define MAX_BUFFER_SIZE 100
-
-// Macro to convert freq to flow (Hz -> mL/min)
-#define FREQ_2_FLOW(F) (F * FACTOR_MILIS / FREQ_MAX * FLOW_MAX)
-
-volatile uint32_t flow_aux = 0, flow_main = 0;
-volatile uint16_t ov_main = 0, ov_aux = 0;
-volatile uint32_t rising_ts = 0;
-volatile uint8_t is_high_main= 0;
+// #define K_FACTOR 1420.0
+// K FACTOR en funcion del jet
+// 17000.0 para el jet 1
+// 7000.0 para el jet 2
+// 3500.0 para el jet 3
+// 2100.0 para el jet 4
+// 1420.0 para no jet
+bool led = 0;
+int selected_k_factor = 0;
+float K_FACTOR = 1420.0;
+unsigned long tiempoAnterior = 0;
+unsigned long intervalo = 1000000; // Intervalo en usegundos para calcular la frecuencia
+volatile unsigned int contadorPulsosNegativo = 0;
+volatile unsigned int contadorPulsosPositivo = 0;
+float flow_pos = 0.0, flow_neg = 0.0;
 char cadena[MAX_BUFFER_SIZE];
 int indice = 0;
 
+
 char REQ_INFO[] = ":IDN*?";
 char REQ_MEAS[] = ":MEASure:FLOW?";
-char SEND_INFO[] = ":IDN:FLOWmeter";
-char SEND_MEAS[] = ":MEASure:FLOW:DATA:";
-char SEND_ERROR[] = ":SCPI:ERROR:";
-
-void edge_isr_aux(void){
-  if (is_high_main){
-    uint32_t ts = micros();
-    uint32_t freq_aux = (uint32_t) SACLAR_US_2_FREQ / (ts - rising_ts);
-    flow_aux = FREQ_2_FLOW(freq_aux); 
-  } else{
-    rising_ts = micros();
-  }
-  is_high_main = 1 - is_high_main;
-}
+char SEND_INFO[] = "IDN:FLOWmeter";
+char SEND_MEAS[] = "MEASure:FLOW:DATA:";
+char SEND_ERROR[] = "SCPI:ERROR:";
 
 void setup() {
 
   Serial.begin(BAUDRATE);
 
-  while (!Serial) {
-    Serial.println("Init flow meter");
-  }
-  pinMode(pin_aux, INPUT);
-  attachInterrupt(digitalPinToInterrupt(pin_aux), edge_isr_aux, CHANGE );
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  pinMode(pinNegativo, INPUT_PULLUP);
+  pinMode(pinPositivo, INPUT_PULLUP);
 
-  noInterrupts ();  // protected code
-  // reset Timer 1
-  // Main flowmeter
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1 = 0;
-  TIMSK1 = 0;
-
-  TIFR1 |= _BV(ICF1); // clear Input Capture Flag so we don't get a bogus interrupt
-  TIFR1 |= _BV(TOV1); // clear Overflow Flag so we don't get a bogus interrupt
-
-  TCCR1B = _BV(CS10) | // start Timer 1, no prescaler
-           _BV(ICES1); // Input Capture Edge Select (1=Rising, 0=Falling)
-
-  TIMSK1 |= _BV(ICIE1); // Enable Timer 1 Input Capture Interrupt
-  TIMSK1 |= _BV(TOIE1); // Enable Timer 1 Overflow Interrupt
-  interrupts ();
+  attachInterrupt(digitalPinToInterrupt(pinNegativo), contarPulsoNegativo, FALLING);
+  attachInterrupt(digitalPinToInterrupt(pinPositivo), contarPulsoPositivo, FALLING);
 }
 
-
-ISR(TIMER1_OVF_vect)
-{
-  ov_main++;
+void contarPulsoNegativo() {
+  contadorPulsosNegativo++;
 }
 
-ISR(TIMER1_CAPT_vect)
-{
-  static uint32_t firstRisingEdgeTime = 0, fallingEdgeTime = 0, secondRisingEdgeTime = 0;
-  static uint32_t high_time_pulse = 0, low_time_pulse = 0;
-//  ov_main = 0;
-  uint16_t overflows = ov_main;
-  
-  // If an overflow happened but has not been handled yet
-  // and the timer count was close to zero, count the
-  // overflow as part of this time.
-  if ((TIFR1 & _BV(TOV1)) && (ICR1 < 1024))
-    overflows++;
-
-  if (low_time_pulse == 0)
-  {
-    if (TCCR1B & _BV(ICES1))
-    {
-      // Interrupted on Second Rising Edge
-      if (firstRisingEdgeTime)  // Already have the first rising edge...
-      {
-        // ... so this is the second rising edge, ending the low part
-        // of the cycle.
-        secondRisingEdgeTime = overflows; // Upper 16 bits
-        secondRisingEdgeTime = (secondRisingEdgeTime << 16) | ICR1;
-        low_time_pulse = secondRisingEdgeTime - fallingEdgeTime;
-
-        // Reset counters
-        uint32_t freq_main = (uint32_t)F_CPU  / (high_time_pulse + low_time_pulse);
-      
-        flow_main = FREQ_2_FLOW(freq_main);
-  
-        firstRisingEdgeTime = 0;
-        high_time_pulse = 0;
-        low_time_pulse = 0;
-      }
-      else
-      {
-        // Interrupted on First Rising Edge
-        // digitalWrite(4, HIGH);
-        firstRisingEdgeTime = overflows; // Upper 16 bits
-        firstRisingEdgeTime = (firstRisingEdgeTime << 16) | ICR1;
-        TCCR1B &= ~_BV(ICES1); // Switch to Falling Edge
-      }
-    }
-    else
-    {
-      // Interrupted on Falling Edge
-      fallingEdgeTime = overflows; // Upper 16 bits
-      fallingEdgeTime = (fallingEdgeTime << 16) | ICR1;
-      TCCR1B |= _BV(ICES1); // Switch to Rising Edge
-      high_time_pulse = fallingEdgeTime - firstRisingEdgeTime;  
-    }
-  }
+void contarPulsoPositivo() {
+  contadorPulsosPositivo++;
 }
 
 void MEAS(char resultado[]) {
-  char f_main[20];
-  sprintf(f_main, "%lu", flow_main);
-  
-  char f_aux[20];
-  sprintf(f_aux, "%lu", flow_aux);
+  char f_pos[20];
+  char f_neg[20];
+  // int len = snprintf(NULL, 0, "%f", flow_neg);
+  // char *f_neg = malloc(len + 1);
+  // snprintf(f_neg, len + 1, "%f", flow_neg);
+  int aux_pos = flow_pos*1000;
+  int aux_neg = flow_neg*1000;
+  // Serial.print("Aux pos: ");Serial.println(aux_pos);
+  // Serial.print("Aux neg: ");Serial.println(aux_neg);
+  sprintf(f_pos, "%d", aux_pos);  // Convert flow_pos to string with 2 decimal places
+  sprintf(f_neg, "%d", aux_neg);  // Convert flow_neg to string with 2 decimal places
 
   strcpy(resultado, SEND_MEAS);
-  strcat(resultado, f_main);
+  strcat(resultado, f_pos);
   strcat(resultado, ":");
-  strcat(resultado, f_aux);
+  strcat(resultado, f_neg);
 }
 
 void INFO(char resultado[]) {
   char dev_num[3];
+  char factor[3];
   sprintf(dev_num, "%03d", DEVICE_NUMBER);
+  sprintf(factor, "%d",selected_k_factor);
   strcpy(resultado, SEND_INFO);
+  strcat(resultado, ":k_factor:");
+  strcat(resultado, factor);
   strcat(resultado, ":DEVice:");
   strcat(resultado, dev_num);
   strcat(resultado, ":VERsion:");
@@ -156,16 +95,49 @@ void ERROR(char resultado[], char msg[]) {
 }
 
 void process_scpi(void) {
-  while (Serial.available() > 0) {
+  if (Serial.available() > 0) {
     char c = Serial.read();
     if (c == '\n') {
       char resultado[MAX_BUFFER_SIZE];
+      char selec_k_factor[20]= "0";
+      char *x = strchr(cadena, '_');
+      if (x != NULL) {
+        int index = x - cadena;
+        strcpy(selec_k_factor, x + 1);
+        strncpy(cadena, cadena, index);
+        cadena[index] = '\0';
+      }
       if (strcmp(cadena, REQ_MEAS) == 0) {
         MEAS(resultado);
       } else if (strcmp(cadena, REQ_INFO) == 0) {
+        if (*selec_k_factor =='1'){
+          K_FACTOR = 17000.0;
+          selected_k_factor = 1;
+        }
+        else if (*selec_k_factor =='2'){
+          K_FACTOR = 7000.0;
+          selected_k_factor = 2;
+        }
+        else if (*selec_k_factor =='3'){
+          K_FACTOR = 3500.0;
+          selected_k_factor = 3;
+        }else if (*selec_k_factor =='4'){
+          K_FACTOR = 2100.0;
+          selected_k_factor = 4;
+        }else{
+          K_FACTOR = 1420.0;
+          selected_k_factor = 0;
+        }
         INFO(resultado);
       } else {
         ERROR(resultado, cadena);
+      }
+      if (led == 0){
+        digitalWrite(LED_BUILTIN, HIGH);
+        led = 1;
+      }else {
+        digitalWrite(LED_BUILTIN, LOW);
+        led = 0;
       }
       strcat(resultado, ENDING_CHARS);
       resultado[MAX_BUFFER_SIZE - 1] = '\0';
@@ -179,8 +151,25 @@ void process_scpi(void) {
   }
 }
 
-
 void loop() {
+
+  unsigned long tiempoActual = micros();
+  // Serial.print("Tiempo actual:");Serial.println(tiempoActual);
+  if (tiempoActual - tiempoAnterior >= intervalo) {
+    unsigned int pulsosNegativo = contadorPulsosNegativo;
+    unsigned int pulsosPositivo = contadorPulsosPositivo;
+    // Serial.print("Pulsos negativos:");Serial.println(pulsosNegativo);
+    contadorPulsosNegativo = 0;
+    contadorPulsosPositivo = 0;
+    tiempoAnterior = tiempoActual;
+    flow_pos = pulsosPositivo*60/K_FACTOR;
+    flow_neg = pulsosNegativo*60/K_FACTOR;
+    // Serial.print("Caudal negativo: ");
+    // Serial.print(flow_neg);
+    // Serial.print(" l/min  ");
+    // Serial.print("Caudal positivo: ");
+    // Serial.print(flow_pos);
+    // Serial.println(" l/min  ");
+  }
   process_scpi();
-  delay(10);
 }
